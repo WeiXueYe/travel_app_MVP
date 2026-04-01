@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python simple_api.py)",
+      "Bash(curl:*)",
+      "Bash(python:*)",
+      "Bash(dir:*)"
+    ]
+  }
+}
