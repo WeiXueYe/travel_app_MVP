@@ -101,6 +101,7 @@ const displayGalleryUrls = computed(() => {
 // 交换主图片和画廊图片
 const swapImage = (clickedUrl: string, index: number) => {
   mainImageUrl.value = clickedUrl
+  index
 }
 </script>
 
@@ -125,12 +126,27 @@ const swapImage = (clickedUrl: string, index: number) => {
 .gallery-content {
   max-width: 1200px;
   width: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  border-radius: 20px;
-  padding: 40px;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
+  border-radius: 25px;
+  padding: 60px;
   position: relative;
   backdrop-filter: blur(20px);
   box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+}
+
+.gallery-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .main-image {
@@ -138,13 +154,36 @@ const swapImage = (clickedUrl: string, index: number) => {
   margin-bottom: 30px;
   width: 100%;
   overflow: hidden;
+  position: relative;
+  border-radius: 15px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
+}
+
+.main-image:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
 }
 
 .main-image img {
   width: 100%;
-  max-height: 500px;
-  object-fit: contain;
+  max-height: 600px;
+  object-fit: cover;
   border-radius: 15px;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.main-image::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.3) 100%);
+  border-radius: 15px;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .image-gallery {
@@ -159,103 +198,187 @@ const swapImage = (clickedUrl: string, index: number) => {
   transition: all 0.3s ease;
   border-radius: 10px;
   overflow: hidden;
+  position: relative;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .gallery-thumbnail:hover {
-  transform: scale(1.05);
-  box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+  transform: scale(1.08);
+  box-shadow: 0 15px 30px rgba(255, 255, 255, 0.3);
+  z-index: 20;
 }
 
 .gallery-thumbnail.active {
-  border: 2px solid #fff;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
-  transform: scale(1.05);
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.6), 0 15px 30px rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+  z-index: 30;
 }
 
 .gallery-thumbnail img {
   width: 100%;
-  height: 120px;
+  height: 150px;
   object-fit: cover;
+  transition: all 0.4s ease;
+}
+
+.gallery-thumbnail:hover img {
+  transform: scale(1.1);
+}
+
+.gallery-thumbnail::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.2) 100%);
+  z-index: 1;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.gallery-thumbnail:hover::before {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.1) 100%);
 }
 
 .content-details h1 {
-  font-size: 2.5rem;
+  font-size: 3rem;
   margin-bottom: 15px;
   text-align: center;
   background: linear-gradient(45deg, #fff, #ccc);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+  letter-spacing: -0.5px;
+  font-weight: 700;
+  position: relative;
+  z-index: 1;
+}
+
+.content-details {
+  position: relative;
+  z-index: 1;
 }
 
 .visual-hook {
   text-align: center;
   font-style: italic;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   opacity: 0.9;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
   color: #ddd;
+  font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
 .travel-info {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin-bottom: 40px;
-  padding: 20px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 15px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 25px;
+  margin-bottom: 50px;
+  padding: 30px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .info-item {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 8px;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.info-item:hover {
+  transform: translateY(-3px);
+  background: rgba(0, 0, 0, 0.4);
+  box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
 }
 
 .info-item span:first-child {
-  font-weight: bold;
+  font-weight: 600;
   opacity: 0.7;
   font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .info-item span:last-child {
   color: #fff;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
+  font-weight: 500;
 }
 
 .story-content h2 {
-  font-size: 1.8rem;
-  margin-bottom: 20px;
+  font-size: 2.2rem;
+  margin-bottom: 30px;
   color: #fff;
+  text-align: center;
+  position: relative;
+  padding-bottom: 15px;
+}
+
+.story-content h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 3px;
+  background: linear-gradient(90deg, #fff, transparent);
+  border-radius: 2px;
 }
 
 .story-content p {
   line-height: 1.8;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   color: #ddd;
   text-align: justify;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 30px;
+  border-radius: 15px;
+  border-left: 4px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .close-button {
   position: absolute;
-  top: 15px;
-  right: 15px;
-  width: 40px;
-  height: 40px;
+  top: 20px;
+  right: 20px;
+  width: 45px;
+  height: 45px;
   border: none;
-  background: rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
   color: #fff;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   cursor: pointer;
   border-radius: 50%;
   transition: all 0.3s ease;
-  z-index: 10;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 300;
 }
 
 .close-button:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: scale(1.1);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+  transform: scale(1.15);
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 /* 响应式设计 */
