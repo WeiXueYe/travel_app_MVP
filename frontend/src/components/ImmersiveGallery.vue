@@ -3,16 +3,17 @@
     <div class="gallery-content">
       <!-- 主图片展示 -->
       <div class="main-image">
-        <img :src="travel?.cover_url" :alt="travel?.title">
+        <img :src="mainImageUrl" :alt="travel?.title">
       </div>
 
       <!-- 图片画廊 -->
-      <div v-if="travel?.gallery_urls && travel.gallery_urls.length > 0" class="image-gallery">
+      <div v-if="displayGalleryUrls.length > 0" class="image-gallery">
         <div
-          v-for="(url, index) in travel.gallery_urls"
+          v-for="(url, index) in displayGalleryUrls"
           :key="index"
           class="gallery-thumbnail"
-          @click="selectImage(index)"
+          :class="{ active: url === mainImageUrl }"
+          @click="swapImage(url, index)"
         >
           <img :src="url" :alt="'Gallery image ' + (index + 1)">
         </div>
@@ -57,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 interface Travel {
   id: number
@@ -81,12 +82,25 @@ defineEmits<{
   close: []
 }>()
 
-// 当前选中的图片索引
-const currentImageIndex = ref(0)
+// 主图片URL（响应式，可以在详情页内交换）
+const mainImageUrl = ref(props.travel?.cover_url || '')
 
-// 选择图片
-const selectImage = (index: number) => {
-  currentImageIndex.value = index
+// 原始画廊图片列表
+const originalGalleryUrls = computed(() => props.travel?.gallery_urls || [])
+
+// 原始封面图片
+const originalCoverUrl = computed(() => props.travel?.cover_url || '')
+
+// 画廊图片列表（包含所有非主图片）
+const displayGalleryUrls = computed(() => {
+  const allImages = [originalCoverUrl.value, ...originalGalleryUrls.value]
+  // 过滤掉当前主图片，返回其他所有图片
+  return allImages.filter(url => url !== mainImageUrl.value)
+})
+
+// 交换主图片和画廊图片
+const swapImage = (clickedUrl: string, index: number) => {
+  mainImageUrl.value = clickedUrl
 }
 </script>
 
@@ -100,10 +114,12 @@ const selectImage = (index: number) => {
   background: rgba(0, 0, 0, 0.95);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   z-index: 1000;
-  padding: 40px;
+  padding: 20px;
   overflow-y: auto;
+  box-sizing: border-box;
+  padding-top: 40px;
 }
 
 .gallery-content {
@@ -114,15 +130,18 @@ const selectImage = (index: number) => {
   padding: 40px;
   position: relative;
   backdrop-filter: blur(20px);
+  box-sizing: border-box;
 }
 
 .main-image {
   text-align: center;
   margin-bottom: 30px;
+  width: 100%;
+  overflow: hidden;
 }
 
 .main-image img {
-  max-width: 100%;
+  width: 100%;
   max-height: 500px;
   object-fit: contain;
   border-radius: 15px;
@@ -145,6 +164,12 @@ const selectImage = (index: number) => {
 .gallery-thumbnail:hover {
   transform: scale(1.05);
   box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+}
+
+.gallery-thumbnail.active {
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+  transform: scale(1.05);
 }
 
 .gallery-thumbnail img {
@@ -214,8 +239,8 @@ const selectImage = (index: number) => {
 
 .close-button {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: 15px;
+  right: 15px;
   width: 40px;
   height: 40px;
   border: none;
@@ -225,6 +250,7 @@ const selectImage = (index: number) => {
   cursor: pointer;
   border-radius: 50%;
   transition: all 0.3s ease;
+  z-index: 10;
 }
 
 .close-button:hover {
@@ -235,7 +261,8 @@ const selectImage = (index: number) => {
 /* 响应式设计 */
 @media (max-width: 768px) {
   .immersive-gallery {
-    padding: 20px;
+    padding: 10px;
+    padding-top: 30px;
   }
 
   .gallery-content {
@@ -248,6 +275,33 @@ const selectImage = (index: number) => {
 
   .travel-info {
     grid-template-columns: 1fr;
+  }
+  
+  .main-image img {
+    max-height: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .immersive-gallery {
+    padding: 5px;
+    padding-top: 20px;
+  }
+
+  .gallery-content {
+    padding: 15px;
+  }
+
+  .content-details h1 {
+    font-size: 1.5rem;
+  }
+  
+  .visual-hook {
+    font-size: 1rem;
+  }
+  
+  .main-image img {
+    max-height: 200px;
   }
 }
 </style>
